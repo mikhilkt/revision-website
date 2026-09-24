@@ -1,1 +1,77 @@
-const owner='mikhilkt',repo='revision-website';const subjects=[{name:'NLP',description:'Natural Language Processing',color:'#9d8cff'},{name:'BI',description:'Business Intelligence',color:'#68d5c0'},{name:'IS Security',description:'Information Systems Security',color:'#f0b56b'}];const grid=document.querySelector('#subjects'),status=document.querySelector('#status'),empty=document.querySelector('#empty'),search=document.querySelector('#search');let filesBySubject={};function displayName(path){return path.replace(/\.pdf$/i,'').replace(/[-_]/g,' ')}function render(filter=''){const query=filter.trim().toLowerCase();let visible=0;grid.innerHTML=subjects.map(subject=>{const files=(filesBySubject[subject.name]||[]).filter(file=>!query||subject.name.toLowerCase().includes(query)||file.name.toLowerCase().includes(query));visible+=files.length;return `<article class="subject"><div class="subject-head" style="border-top:3px solid ${subject.color}"><h2>${subject.name}</h2><p>${subject.description}</p></div><div class="notes">${files.length?files.map(file=>`<a class="note" href="${file.download_url}" target="_blank" rel="noreferrer"><span><span class="pdf-icon">▣</span> &nbsp;${displayName(file.name)}</span><span class="open">Open PDF ↗</span></a>`).join(''):'<div class="no-notes">No PDFs uploaded yet</div>'}</div></article>`}).join('');empty.hidden=visible!==0}async function loadNotes(){try{const results=await Promise.all(subjects.map(async subject=>{const response=await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${encodeURIComponent(subject.name)}`);if(!response.ok)throw new Error('Unable to load notes');const files=await response.json();return[subject.name,files.filter(file=>file.type==='file'&&file.name.toLowerCase().endsWith('.pdf'))]}));filesBySubject=Object.fromEntries(results);const count=Object.values(filesBySubject).reduce((total,files)=>total+files.length,0);status.textContent=`${count} PDF${count===1?'':'s'} available`;render()}catch(error){status.textContent='Notes could not be loaded right now';render()}}search.addEventListener('input',event=>render(event.target.value));document.querySelector('#year').textContent=new Date().getFullYear();loadNotes();
+const owner = 'mikhilkt';
+const repo = 'revision-website';
+const subjects = [
+  { name: 'NLP', description: 'Natural Language Processing', color: '#9d8cff' },
+  { name: 'BI', description: 'Business Intelligence', color: '#68d5c0' },
+  { name: 'IS Security', description: 'Information Systems Security', color: '#f0b56f' }
+];
+
+const grid = document.querySelector('#subjects');
+const status = document.querySelector('#status');
+const empty = document.querySelector('#empty');
+const search = document.querySelector('#search');
+let filesBySubject = {};
+
+function displayName(path) {
+  return path.replace(/\.pdf$/i, '').replace(/[-_]/g, ' ');
+}
+
+function pdfUrl(file) {
+  // Use the deployed site's own PDF URL. GitHub's download_url sends PDFs
+  // with Content-Disposition: attachment, which makes the browser download them.
+  return file.path.split('/').map(encodeURIComponent).join('/');
+}
+
+function render(filter = '') {
+  const query = filter.trim().toLowerCase();
+  let visible = 0;
+
+  grid.innerHTML = subjects.map(subject => {
+    const files = (filesBySubject[subject.name] || []).filter(file =>
+      !query ||
+      subject.name.toLowerCase().includes(query) ||
+      file.name.toLowerCase().includes(query)
+    );
+    visible += files.length;
+
+    return `<article class="subject">
+      <div class="subject-head" style="border-top:3px solid ${subject.color}">
+        <h2>${subject.name}</h2>
+        <p>${subject.description}</p>
+      </div>
+      <div class="notes">
+        ${files.length ? files.map(file => `<a class="note" href="${pdfUrl(file)}" target="_blank" rel="noreferrer">
+          <span><span class="pdf-icon">▣</span>&nbsp; ${displayName(file.name)}</span>
+          <span class="open">Open PDF ↗</span>
+        </a>`).join('') : '<div class="no-notes">No PDFs uploaded yet</div>'}
+      </div>
+    </article>`;
+  }).join('');
+
+  empty.hidden = visible !== 0;
+}
+
+async function loadNotes() {
+  try {
+    const results = await Promise.all(subjects.map(async subject => {
+      const response = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${encodeURIComponent(subject.name)}`);
+      if (!response.ok) throw new Error('Unable to load notes');
+      const files = await response.json();
+      return [subject.name, files.filter(file =>
+        file.type === 'file' && file.name.toLowerCase().endsWith('.pdf')
+      )];
+    }));
+
+    filesBySubject = Object.fromEntries(results);
+    const count = Object.values(filesBySubject).reduce((total, files) => total + files.length, 0);
+    status.textContent = `${count} PDF${count === 1 ? '' : 's'} available`;
+    render();
+  } catch (error) {
+    status.textContent = 'Notes could not be loaded right now';
+    render();
+  }
+}
+
+search.addEventListener('input', event => render(event.target.value));
+document.querySelector('#year').textContent = new Date().getFullYear();
+loadNotes();
