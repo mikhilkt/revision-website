@@ -2,6 +2,7 @@ const owner = 'mikhilkt';
 const repo = 'revision-website';
 const subjects = [
   { name: 'NLP', description: 'Natural Language Processing', color: '#9d8cff' },
+  { name: 'NLP mock papers', description: 'Mock exam papers and practice questions', color: '#7cc7ff' },
   { name: 'BI', description: 'Business Intelligence', color: '#68d5c0' },
   { name: 'IS Security', description: 'Information Systems Security', color: '#f0b56f' }
 ];
@@ -135,7 +136,7 @@ viewerStyles.textContent = `
   .pdf-viewer[hidden] { display: none; }
   .pdf-viewer { position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; padding: 1rem; }
   .pdf-viewer-backdrop { position: absolute; inset: 0; background: rgba(0, 0, 0, .82); }
-  .pdf-viewer-panel { position: relative; z-index: 1; width: min(1100px, 100%); height: min(90vh, 900px); display: flex; flex-direction: column; background: #131720; border: 1px solid #282e3b; border-radius: 12px; overflow: hidden; box-shadow: 0 20px 60px rgba(0, 0, 0, .5); }
+  .pdf-viewer-panel { position: relative; z-index: 1; width: min(1100px, 100%); height: min(90vh, 900px); display: flex; flex-direction: column; background: #131720; border: 1px solid #282e3b; border-radius: 18px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,.5); }
   .pdf-viewer-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: .75rem 1rem; border-bottom: 1px solid #282e3b; }
   .pdf-viewer-title { margin: 0; font-size: 1rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .pdf-viewer-close { border: 0; background: transparent; color: inherit; font-size: 1.8rem; line-height: 1; cursor: pointer; padding: 0 .25rem; }
